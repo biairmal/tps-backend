@@ -11,7 +11,7 @@ app.listen(port, () => {
 })
 
 const { Sequelize } = require('sequelize')
-const DB = require('./src/configs/dabase.config')
+const DB = require('./src/config/dabase.config')
 
 const sequelize = new Sequelize(DB.name, DB.username, DB.password, {
   dialect: DB.dialect,
