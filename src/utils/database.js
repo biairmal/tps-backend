@@ -9,7 +9,7 @@ module.exports = async function connectDB() {
     host: DB.host,
     port: DB.port,
   })
-  
+
   try {
     await sequelize.authenticate()
     console.log('Connection has been established successfully.')
