@@ -6,7 +6,8 @@ module.exports = {
       'Users',
       {
         id: {
-          defaultValue: DataTypes.UUIDV4,
+          allowNull:false,
+          defaultValue: Sequelize.UUIDV4,
           primaryKey: true,
           type: DataTypes.UUID,
         },
@@ -20,7 +21,6 @@ module.exports = {
           type: DataTypes.STRING,
         },
         last_name: {
-          allowNull: false,
           type: DataTypes.STRING,
         },
         role: {

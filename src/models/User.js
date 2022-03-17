@@ -2,12 +2,8 @@ const Sequelize = require('sequelize');
 
 class User extends Sequelize.Model {
   static init(sequelize, DataTypes) {
+    
   return super.init({
-    id: {
-      type: DataTypes.UUID,
-      allowNull: false,
-      primaryKey: true
-    },
     username: {
       type: DataTypes.STRING(255),
       allowNull: false,
@@ -19,7 +15,6 @@ class User extends Sequelize.Model {
     },
     last_name: {
       type: DataTypes.STRING(255),
-      allowNull: false
     },
     role: {
       type: DataTypes.ENUM("distributor","admin","dealer"),
