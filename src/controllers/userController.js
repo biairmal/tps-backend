@@ -1,12 +1,11 @@
 const userServices = require('../services/userServices')
 
 exports.createUser = async (req, res) => {
-  // console.log(req)
   try {
-    
     const user = req.body
 
     const data = await userServices.createUser(user)
+    if(data.errors) throw data.errors
 
     res.status(201).json({
       success: true,
@@ -14,7 +13,11 @@ exports.createUser = async (req, res) => {
       data,
     })
   } catch (err) {
-    res.sendStatus(500)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to create user!',
+      errors: err
+    })
   }
 }
 

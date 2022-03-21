@@ -5,8 +5,13 @@ const userController = require('../controllers/userController')
 
 const router = Router()
 
-router.route('/user')
-    .post(userSchema.createUserSchema, validateRequestSchema, userController.createUser)
-    .get(userController.getUsers)
+router
+  .route('/user')
+  .post(
+    userSchema.createUserSchema,
+    validateRequestSchema,
+    userController.createUser
+  )
+  .get(userController.getUsers)
 
 module.exports = router
