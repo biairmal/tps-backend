@@ -6,12 +6,22 @@ const userController = require('../controllers/userController')
 const router = Router()
 
 router
-  .route('/user')
+  .route('/users')
   .post(
     userSchema.createUserSchema,
     validateRequestSchema,
     userController.createUser
   )
   .get(userController.getUsers)
+
+router
+  .route('/users/:id')
+  .get(userController.getUserById)
+  .delete(userController.deleteUserById)
+  .put(
+    userSchema.updateUserSchema,
+    validateRequestSchema,
+    userController.updateUserById
+  )
 
 module.exports = router

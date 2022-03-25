@@ -6,6 +6,7 @@ module.exports = (req, res, next) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({
       success: false,
+      message: 'Bad request!',
       errors: errors.array(),
     })
   }
