@@ -1,21 +1,31 @@
 const createError = require('http-errors')
+const bcrypt = require('bcrypt')
 const { User } = require('../models')
 
-exports.createUser = async (user) =>
-  User.create({
-    id: user.id,
-    username: user.username,
-    password: user.password,
-    first_name: user.first_name,
-    last_name: user.last_name,
-    role: user.role,
-  })
+exports.createUser = async (user) => {
+  try {
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(user.password, salt)
+
+    return User.create({
+      id: user.id,
+      username: user.username,
+      password: hashedPassword,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      role: user.role,
+    })
+  } catch (error) {
+    console.log(error)
+    throw error
+  }
+}
 
 exports.getUserById = async (id) => {
   try {
     const user = await User.findByPk(id)
 
-    if(!user) throw createError(404, 'User not found!')
+    if (!user) throw createError(404, 'User not found!')
 
     return user
   } catch (error) {

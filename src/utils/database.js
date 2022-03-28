@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize')
 
 const env = process.env.NODE_ENV || 'development'
-const DB = require('../config/database.config')[env]
+const DB = require('../config/databaseConfig')[env]
 
 const sequelize = new Sequelize(DB.name, DB.username, DB.password, {
   dialect: DB.dialect,
@@ -12,8 +12,8 @@ const sequelize = new Sequelize(DB.name, DB.username, DB.password, {
 
 const connectDB = async () => {
   try {
-    // await sequelize.sync({ force: true })
-    await sequelize.sync()
+    await sequelize.sync({ force: true })
+    // await sequelize.sync()
     console.log('All models were synchronized successfully.')
     await sequelize.authenticate()
     console.log('Connection has been established successfully.')
