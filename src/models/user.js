@@ -7,9 +7,9 @@ module.exports = (sequelize, DataTypes) => {
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
-    // static associate(models) {
-    //   // define association here
-    // }
+    static associate(models) {
+      // define association here
+    }
   }
   User.init(
     {
@@ -22,17 +22,17 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      first_name: {
+      firstName: {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      last_name: {
+      lastName: {
         type: DataTypes.STRING,
       },
       role: {
         type: DataTypes.ENUM(['distributor', 'admin', 'dealer']),
         allowNull: false,
-        defaultValue: 'dealer'
+        defaultValue: 'dealer',
       },
     },
     {

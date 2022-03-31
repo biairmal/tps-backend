@@ -13,13 +13,13 @@ const createUserSchema = [
   body('password')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('password can not be blank'),
-  body('first_name')
+  body('firstName')
     .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('first_name can not be blank'),
-  body('last_name')
+    .withMessage('firstName can not be blank'),
+  body('lastName')
     .optional()
     .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('last_name can not be blank'),
+    .withMessage('lastName can not be blank'),
   body('role')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('role can not be blank'),
@@ -40,14 +40,14 @@ const updateUserSchema = [
     .optional()
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('password can not be blank'),
-  body('first_name')
+  body('firstName')
     .optional()
     .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('first_name can not be blank'),
-  body('last_name')
+    .withMessage('firstName can not be blank'),
+  body('lastName')
     .optional()
     .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('last_name can not be blank'),
+    .withMessage('lastName can not be blank'),
   body('role')
     .optional()
     .exists({ checkFalsy: true, checkNull: true })

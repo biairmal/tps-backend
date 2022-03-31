@@ -11,8 +11,8 @@ exports.createUser = async (user) => {
       id: user.id,
       username: user.username,
       password: hashedPassword,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
       role: user.role,
     })
   } catch (error) {
@@ -35,10 +35,10 @@ exports.getUserById = async (id) => {
 }
 
 exports.getUsers = async (query) => {
-  const filter = JSON.parse(JSON.stringify(query))
   const options = {}
 
   if (query) {
+    const filter = JSON.parse(JSON.stringify(query))
     if (query.limit) {
       options.limit = parseInt(query.limit, 10)
       delete filter.limit

@@ -30,8 +30,8 @@ describe('User Management', () => {
       const data = {
         username: 'username1',
         password: 'password',
-        first_name: 'User',
-        last_name: 'One',
+        firstName: 'User',
+        lastName: 'One',
         role: 'admin',
       }
       // Exercise
@@ -48,7 +48,7 @@ describe('User Management', () => {
           res.body.should.have.property('message')
           res.body.should.have.property('data')
           res.body.data.should.have.property('username')
-          res.body.data.should.have.property('first_name')
+          res.body.data.should.have.property('firstName')
           res.body.data.should.have.property('role')
           done()
         })
@@ -57,8 +57,8 @@ describe('User Management', () => {
       // Setup
       const data = {
         password: 'password',
-        first_name: 'User',
-        last_name: 'One',
+        firstName: 'User',
+        lastName: 'One',
         role: 'admin',
       }
       // Exercise
@@ -81,8 +81,8 @@ describe('User Management', () => {
       // Setup
       const data = {
         username: 'username2',
-        first_name: 'User',
-        last_name: 'One',
+        firstName: 'User',
+        lastName: 'One',
         role: 'admin',
       }
       // Exercise
@@ -101,12 +101,12 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should not create user without first_name', (done) => {
+    it('should not create user without firstName', (done) => {
       // Setup
       const data = {
         username: 'username2',
         password: 'password',
-        last_name: 'One',
+        lastName: 'One',
         role: 'admin',
       }
       // Exercise
@@ -130,8 +130,8 @@ describe('User Management', () => {
       const data = {
         username: '!',
         password: 'a',
-        first_name: 'User',
-        last_name: 'One',
+        firstName: 'User',
+        lastName: 'One',
         role: 'admin',
       }
       // Exercise
@@ -157,15 +157,15 @@ describe('User Management', () => {
       User.create({
         username: 'username2',
         password: 'password',
-        first_name: 'User',
-        last_name: 'Two',
+        firstName: 'User',
+        lastName: 'Two',
         role: 'dealer',
       })
       User.create({
         username: 'username3',
         password: 'password',
-        first_name: 'User',
-        last_name: 'Three',
+        firstName: 'User',
+        lastName: 'Three',
         role: 'distributor',
       })
       done()
@@ -238,8 +238,8 @@ describe('User Management', () => {
       // Setup
       const updateData = {
         password: 'updatepassword',
-        first_name: 'Update',
-        last_name: 'Test',
+        firstName: 'Update',
+        lastName: 'Test',
         role: 'admin',
       }
       // Exercise
@@ -262,8 +262,8 @@ describe('User Management', () => {
       // Setup
       const updateData = {
         password: '',
-        first_name: '',
-        last_name: '',
+        firstName: '',
+        lastName: '',
         role: '',
       }
       // Exercise
@@ -286,8 +286,8 @@ describe('User Management', () => {
       // Setup
       const updateData = {
         password: 'updatepassword',
-        first_name: 'Update',
-        last_name: 'Test',
+        firstName: 'Update',
+        lastName: 'Test',
         role: 'admin',
       }
       // Exercise
@@ -314,8 +314,8 @@ describe('User Management', () => {
       const user = User.build({
         username: 'usernameDelete',
         password: 'password',
-        first_name: 'User',
-        last_name: 'Delete',
+        firstName: 'User',
+        lastName: 'Delete',
         role: 'dealer',
       })
 

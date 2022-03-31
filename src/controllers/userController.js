@@ -103,7 +103,6 @@ exports.deleteUserById = async (req, res) => {
     const data = await userServices.deleteUserById(id)
 
     if (data.errors) throw data.errors
-    console.log('test')
 
     res.status(200).json({
       success: true,
