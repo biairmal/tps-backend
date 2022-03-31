@@ -70,7 +70,6 @@ exports.getUsers = async (req, res) => {
   }
 }
 
-
 exports.updateUserById = async (req, res) => {
   try {
     const { id } = req.params
@@ -79,7 +78,7 @@ exports.updateUserById = async (req, res) => {
     const data = await userServices.updateUserById(id, newData)
 
     if (data.errors) throw data.errors
-    
+
     res.status(200).json({
       success: true,
       message: 'Successfully updated user!',
