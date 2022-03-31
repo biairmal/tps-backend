@@ -4,12 +4,11 @@ const express = require('express')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 
-const passport = require('./src/utils/passport')
-const sessionConfig = require('./src/config/sessionsConfig')
-const { connectDB, sequelize } = require('./src/utils/database')
+const passport = require('./utils/passport')
+const sessionConfig = require('./config/sessionsConfig')
+const { connectDB, sequelize } = require('./utils/database')
 
-const authRoutes = require('./src/routes/authRoutes')
-const userRoutes = require('./src/routes/userRoutes')
+const routes = require('./routes')
 
 const app = express()
 const port = process.env.PORT || 8000
@@ -26,8 +25,9 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 // Initialize Routes
-app.use('/api', authRoutes)
-app.use('/api', userRoutes)
+Object.keys(routes).forEach((route) => {
+  app.use('/api', routes[route])
+})
 
 // Connecting to DB and starting up the server
 connectDB().then(() => {

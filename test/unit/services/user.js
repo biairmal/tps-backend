@@ -1,7 +1,7 @@
 // required devDependencies
 const chai = require('chai')
 const chaiHttp = require('chai-http')
-const server = require('../../../index')
+const server = require('../../../src/index')
 const should = chai.should()
 // define model
 const { User } = require('../../../src/models')
