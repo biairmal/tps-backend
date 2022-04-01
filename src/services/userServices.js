@@ -7,7 +7,7 @@ exports.createUser = async (user) => {
     const salt = await bcrypt.genSalt(10)
     const hashedPassword = await bcrypt.hash(user.password, salt)
 
-    return User.create({
+    let createdUser = await User.create({
       id: user.id,
       username: user.username,
       password: hashedPassword,
@@ -15,6 +15,11 @@ exports.createUser = async (user) => {
       lastName: user.lastName,
       role: user.role,
     })
+
+    createdUser = createdUser.toJSON()
+    delete createdUser.password
+
+    return createdUser
   } catch (error) {
     console.log(error)
     throw error

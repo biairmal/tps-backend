@@ -5,7 +5,8 @@ const { User } = require('../models')
 
 passport.use(
   new LocalStrategy((username, password, cb) => {
-    User.findOne({ where: { username } })
+    User.scope('withPassword')
+      .findOne({ where: { username } })
       .then((user) => {
         // If no user found
         if (!user) return cb(null, false)
