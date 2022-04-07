@@ -4,40 +4,34 @@ const chaiHttp = require('chai-http')
 const server = require('../../../src/index')
 const should = chai.should()
 // define model
-const { User } = require('../../../src/models')
+const { Buyer } = require('../../../src/models')
+
+const disableConsole = require('../disableConsole')
 
 chai.use(chaiHttp)
 
-describe('User Management', () => {
-  // beforeEach(() => {
-  //   console.log = function () {}
-  // })
-
-  // afterEach(() => {
-  //   delete console.log
-  // })
-
+describe('Buyer Management', () => {
+  disableConsole()
   before((done) => {
     // Empty table to avoid unique violation
-    User.destroy({ where: {}, truncate: true })
+    Buyer.destroy({ where: {}, truncate: true })
     done()
   })
 
-  // Test create user
-  describe('/POST user', () => {
-    it('should create user with valid request', (done) => {
+  // Test create buyer
+  describe('/POST buyers', () => {
+    it('should create buyer with valid request', (done) => {
       // Setup
       const data = {
-        username: 'username1',
-        password: 'password',
-        firstName: 'User',
-        lastName: 'One',
-        role: 'admin',
+        name: 'Buyer Test',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
       }
       // Exercise
       chai
         .request(server)
-        .post('/api/users')
+        .post('/api/buyers')
         .send(data)
         .end((err, res) => {
           // Verify
@@ -47,24 +41,25 @@ describe('User Management', () => {
           res.body.success.should.equal(true)
           res.body.should.have.property('message')
           res.body.should.have.property('data')
-          res.body.data.should.have.property('username')
-          res.body.data.should.have.property('firstName')
-          res.body.data.should.have.property('role')
+          res.body.data.should.have.property('name')
+          res.body.data.should.have.property('phone')
+          res.body.data.should.have.property('email')
+          res.body.data.should.have.property('address')
           done()
         })
     })
-    it('should not create user without username', (done) => {
+
+    it('should not create buyer without name', (done) => {
       // Setup
       const data = {
-        password: 'password',
-        firstName: 'User',
-        lastName: 'One',
-        role: 'admin',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
       }
       // Exercise
       chai
         .request(server)
-        .post('/api/users')
+        .post('/api/buyers')
         .send(data)
         .end((err, res) => {
           // Verify
@@ -77,67 +72,18 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should not create user without password', (done) => {
+
+    it('should not create buyer without phone', (done) => {
       // Setup
       const data = {
-        username: 'username2',
-        firstName: 'User',
-        lastName: 'One',
-        role: 'admin',
+        name: 'Buyer Test',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
       }
       // Exercise
       chai
         .request(server)
-        .post('/api/users')
-        .send(data)
-        .end((err, res) => {
-          // Verify
-          res.should.have.status(400)
-          res.body.should.be.a('object')
-          res.body.should.have.property('success')
-          res.body.success.should.equal(false)
-          res.body.should.have.property('message')
-          res.body.should.have.property('errors')
-          done()
-        })
-    })
-    it('should not create user without firstName', (done) => {
-      // Setup
-      const data = {
-        username: 'username2',
-        password: 'password',
-        lastName: 'One',
-        role: 'admin',
-      }
-      // Exercise
-      chai
-        .request(server)
-        .post('/api/users')
-        .send(data)
-        .end((err, res) => {
-          // Verify
-          res.should.have.status(400)
-          res.body.should.be.a('object')
-          res.body.should.have.property('success')
-          res.body.success.should.equal(false)
-          res.body.should.have.property('message')
-          res.body.should.have.property('errors')
-          done()
-        })
-    })
-    it('should notify when criteria is not fulfilled', (done) => {
-      // Setup
-      const data = {
-        username: '!',
-        password: 'a',
-        firstName: 'User',
-        lastName: 'One',
-        role: 'admin',
-      }
-      // Exercise
-      chai
-        .request(server)
-        .post('/api/users')
+        .post('/api/buyers')
         .send(data)
         .end((err, res) => {
           // Verify
@@ -152,32 +98,31 @@ describe('User Management', () => {
     })
   })
 
-  describe('/GET user', () => {
-    before((done) => {
-      User.create({
-        username: 'username2',
-        password: 'password',
-        firstName: 'User',
-        lastName: 'Two',
-        role: 'dealer',
-      })
-      User.create({
-        username: 'username3',
-        password: 'password',
-        firstName: 'User',
-        lastName: 'Three',
-        role: 'distributor',
-      })
-      done()
-    })
-
+  describe('/GET buyers', () => {
     let testId
 
-    it('should return all users', (done) => {
+    before(async () => {
+      const buyer1 = await Buyer.create({
+        name: 'Buyer Test',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
+      })
+      const buyer2 = await Buyer.create({
+        name: 'Buyer Test',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
+      })
+
+      testId = buyer1.id
+    })
+
+    it('should return all buyers', (done) => {
       // Exercise
       chai
         .request(server)
-        .get('/api/users')
+        .get('/api/buyers')
         .end((err, res) => {
           // Verify
           res.should.have.status(200)
@@ -191,11 +136,12 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should return one user when id is specified', (done) => {
+
+    it('should return one buyer when id is specified', (done) => {
       // Exercise
       chai
         .request(server)
-        .get(`/api/users/${testId}`)
+        .get(`/api/buyers/${testId}`)
         .end((err, res) => {
           // Verify
           res.should.have.status(200)
@@ -207,11 +153,12 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should notify if no user found', (done) => {
+
+    it('should notify if no buyer found', (done) => {
       // Exercise
       chai
         .request(server)
-        .get(`/api/users/0`)
+        .get(`/api/buyers/0`)
         .end((err, res) => {
           // Verify
           res.should.have.status(404)
@@ -224,17 +171,22 @@ describe('User Management', () => {
         })
     })
   })
-  describe('/PUT user', () => {
+
+  describe('/PUT buyers', () => {
     let testId
 
-    before((done) => {
-      User.findAll().then((data) => {
-        testId = data[0].id
-        done()
+    before(async () => {
+      const buyer = await Buyer.create({
+        name: 'Buyer Test',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
       })
+
+      testId = buyer.id
     })
 
-    it('should update user on valid request', (done) => {
+    it('should update buyer on valid request', (done) => {
       // Setup
       const updateData = {
         password: 'updatepassword',
@@ -245,7 +197,7 @@ describe('User Management', () => {
       // Exercise
       chai
         .request(server)
-        .put(`/api/users/${testId}`)
+        .put(`/api/buyers/${testId}`)
         .send(updateData)
         .end((err, res) => {
           // Verify
@@ -258,7 +210,8 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should not update user with bad request', (done) => {
+
+    it('should not update buyer with bad request', (done) => {
       // Setup
       const updateData = {
         password: '',
@@ -269,7 +222,7 @@ describe('User Management', () => {
       // Exercise
       chai
         .request(server)
-        .put(`/api/users/${testId}`)
+        .put(`/api/buyers/${testId}`)
         .send(updateData)
         .end((err, res) => {
           // Verify
@@ -282,7 +235,8 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should notify if no user found', (done) => {
+
+    it('should notify if no buyer found', (done) => {
       // Setup
       const updateData = {
         password: 'updatepassword',
@@ -293,7 +247,7 @@ describe('User Management', () => {
       // Exercise
       chai
         .request(server)
-        .put(`/api/users/0`)
+        .put(`/api/buyers/0`)
         .send(updateData)
         .end((err, res) => {
           // Verify
@@ -307,29 +261,26 @@ describe('User Management', () => {
         })
     })
   })
-  describe('/DELETE user', () => {
+
+  describe('/DELETE buyers', () => {
     let testId
 
-    before((done) => {
-      const user = User.build({
-        username: 'usernameDelete',
-        password: 'password',
-        firstName: 'User',
-        lastName: 'Delete',
-        role: 'dealer',
+    before(async () => {
+      const buyer = await Buyer.create({
+        name: 'Buyer Test',
+        phone: '081212341234',
+        email: 'buyertest@mail.com',
+        address: 'Automated City, Test Province',
       })
 
-      user.save().then(() => {
-        testId = user.id
-        done()
-      })
+      testId = buyer.id
     })
 
-    it('should notify if no user found', (done) => {
+    it('should notify if no buyer found', (done) => {
       // Exercise
       chai
         .request(server)
-        .delete(`/api/users/0`)
+        .delete(`/api/buyers/0`)
         .end((err, res) => {
           // Verify
           res.should.have.status(404)
@@ -341,11 +292,12 @@ describe('User Management', () => {
           done()
         })
     })
-    it('should delete user with valid user id', (done) => {
+
+    it('should delete buyer with valid buyer id', (done) => {
       // Exercise
       chai
         .request(server)
-        .delete(`/api/users/${testId}`)
+        .delete(`/api/buyers/${testId}`)
         .end((err, res) => {
           // Verify
           res.should.have.status(200)

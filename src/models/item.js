@@ -50,6 +50,16 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
         allowNull: false,
       },
+      discount: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      tax: {
+        type: DataTypes.FLOAT,
+        allowNull: false,
+        defaultValue: 10,
+      },
     },
     {
       sequelize,

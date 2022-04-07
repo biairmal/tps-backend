@@ -1,6 +1,7 @@
 const createError = require('http-errors')
 const handleErrors = require('../helpers/handleErrors')
 const { Item } = require('../models')
+const { deleteCloudPicture } = require('../utils/cloudinary')
 
 exports.create = async (item) => {
   try {
@@ -50,17 +51,22 @@ exports.getById = async (id) => {
 }
 
 exports.deleteById = async (id) => {
-  const deletedRow = await Item.destroy({ where: { id } })
+  const item = await this.getById(id)
 
-  if (!deletedRow) throw createError(404, 'Item not found!')
+  if (item.picture) deleteCloudPicture(item.picture)
 
-  return { deletedRow }
+  await item.destroy()
+
+  return item
 }
 
 exports.updateById = async (id, data) => {
-  const updatedRow = await Item.update(data, { where: { id } })
+  const item = await this.getById(id)
 
-  if (!updatedRow[0]) throw createError(404, 'Item not found!')
+  if (item.picture) deleteCloudPicture(item.picture)
 
-  return { updatedRow: updatedRow[0] }
+  item.set(data)
+  await item.save()
+
+  return item
 }

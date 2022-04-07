@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       // define association here
       this.belongsTo(models.Transaction, { as: 'transaction' })
       this.belongsTo(models.Item, { as: 'item' })
+      this.belongsTo(models.DailyReport, { foreignKey: 'dateId' })
     }
   }
   SoldItem.init(

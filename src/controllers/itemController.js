@@ -3,6 +3,7 @@ const { itemServices } = require('../services')
 exports.createItem = async (req, res) => {
   try {
     const item = req.body
+    if (req.file) item.picture = req.file.path
 
     const data = await itemServices.create(item)
 
@@ -73,8 +74,6 @@ exports.deleteItemById = async (req, res) => {
     const { id } = req.params
     const data = await itemServices.deleteById(id)
 
-    if (data.errors) throw data.errors
-
     return res.status(200).json({
       success: true,
       message: 'Successfully retrieved item',
@@ -95,6 +94,7 @@ exports.updateItemById = async (req, res) => {
   try {
     const { id } = req.params
     const updateData = req.body
+    if (req.file) updateData.picture = req.file.path
 
     const data = await itemServices.updateById(id, updateData)
 

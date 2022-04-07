@@ -3,6 +3,7 @@ require('dotenv').config()
 const express = require('express')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
+const { CronJob } = require('cron')
 
 const passport = require('./utils/passport')
 const sessionConfig = require('./config/sessionsConfig')
@@ -29,6 +30,26 @@ Object.keys(routes).forEach((route) => {
   app.use('/api', routes[route])
 })
 
+// Initialize Scheduled Task
+const { dailyReportServices } = require('./services')
+
+const createDailyReport = new CronJob(
+  '0 0 * * *',
+  dailyReportServices.createDate,
+  null,
+  true,
+  'Asia/Jakarta'
+)
+const calculateDailyReport = new CronJob(
+  '0 0 * * *',
+  dailyReportServices.calculateDailyReport,
+  null,
+  true,
+  'Asia/Jakarta'
+)
+
+createDailyReport.start()
+calculateDailyReport.start()
 // Connecting to DB and starting up the server
 connectDB().then(() => {
   app.listen(port, () => {
