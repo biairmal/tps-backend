@@ -1,6 +1,7 @@
 const { Router } = require('express')
 const multer = require('multer')
 const validateRequestSchema = require('../middlewares/validateRequestSchema')
+const checkRole = require('../middlewares/checkRole')
 const itemSchema = require('../validations/itemSchema')
 const itemController = require('../controllers/itemController')
 const { getStorage } = require('../utils/cloudinary')
@@ -12,8 +13,9 @@ const router = Router()
 
 router
   .route('/items')
-  .get(itemController.getItems)
+  .get(checkRole(['admin', 'distributor', 'dealer']), itemController.getItems)
   .post(
+    checkRole(['admin', 'distributor']),
     upload.single('picture'),
     itemSchema.createItemSchema,
     validateRequestSchema,
@@ -22,8 +24,15 @@ router
 
 router
   .route('/items/:id')
-  .get(itemController.getItemById)
-  .delete(itemController.deleteItemById)
-  .put(upload.single('picture'), itemController.updateItemById)
+  .get(
+    checkRole(['admin', 'distributor', 'dealer']),
+    itemController.getItemById
+  )
+  .delete(checkRole(['admin', 'distributor']), itemController.deleteItemById)
+  .put(
+    checkRole(['admin', 'distributor']),
+    upload.single('picture'),
+    itemController.updateItemById
+  )
 
 module.exports = router
