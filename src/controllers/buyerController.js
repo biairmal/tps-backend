@@ -1,3 +1,4 @@
+const response = require('../utils/reponse')
 const { buyerServices } = require('../services')
 
 exports.createBuyer = async (req, res) => {
@@ -6,20 +7,15 @@ exports.createBuyer = async (req, res) => {
 
     const data = await buyerServices.create(buyer)
 
-    return res.status(201).json({
-      success: true,
-      message: 'Successfully created buyer!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
-    const errorData = errors.data || 'Internal server error'
+    return response.created(res, data, 'Successfully created buyer!')
+  } catch (error) {
+    console.log(error)
 
-    return res.status(statusCode).json({
-      success: false,
-      message: 'Failed to create buyer!',
-      errors: errorData,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to create buyer!'
+    )
   }
 }
 
@@ -27,67 +23,35 @@ exports.getBuyers = async (req, res) => {
   try {
     const data = await buyerServices.get(req.query)
 
-    if (data.errors) throw data.errors
+    return response.success(res, data, 'Successfully retrieved buyers!')
+  } catch (error) {
+    console.log(error)
 
-    return res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved buyers',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
-
-    return res.status(statusCode).json({
-      success: false,
-      message: 'Failed to retrieve buyers!',
-      errors: errors.message,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve buyers!'
+    )
   }
 }
 
 exports.getBuyerById = async (req, res) => {
   try {
     const { id } = req.params
+
     const data = await buyerServices.getById(id)
 
-    if (data.errors) throw data.errors
+    if (!data) return response.not_found(res, undefined, 'Buyer not found!')
 
-    return res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved buyer',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    return response.success(res, data, 'Successfully retrieved buyer!')
+  } catch (error) {
+    console.log(error)
 
-    return res.status(statusCode).json({
-      success: false,
-      message: 'Failed to retrieve buyer!',
-      errors: errors.message,
-    })
-  }
-}
-
-exports.deleteBuyerById = async (req, res) => {
-  try {
-    const { id } = req.params
-    const data = await buyerServices.deleteById(id)
-
-    if (data.errors) throw data.errors
-
-    return res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved buyer',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
-
-    return res.status(statusCode).json({
-      success: false,
-      message: 'Failed to retrieve buyer!',
-      errors: errors.message,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve buyer!'
+    )
   }
 }
 
@@ -98,18 +62,36 @@ exports.updateBuyerById = async (req, res) => {
 
     const data = await buyerServices.updateById(id, updateData)
 
-    return res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved buyer',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    if (!data) return response.not_found(res, undefined, 'Buyer not found!')
 
-    return res.status(statusCode).json({
-      success: false,
-      message: 'Failed to retrieve buyer!',
-      errors: errors.message,
-    })
+    return response.success(res, data, 'Successfully updated buyer!')
+  } catch (error) {
+    console.log(error)
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to update buyers!'
+    )
+  }
+}
+
+exports.deleteBuyerById = async (req, res) => {
+  try {
+    const { id } = req.params
+
+    const data = await buyerServices.deleteById(id)
+
+    if (!data) return response.not_found(res, undefined, 'Buyer not found!')
+
+    return response.success(res, undefined, 'Successfully deleted buyer!')
+  } catch (error) {
+    console.log(error)
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to delete buyer!'
+    )
   }
 }

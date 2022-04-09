@@ -16,7 +16,6 @@ module.exports = (query) => {
       delete filter.page
     }
 
-    // if (filter) options.where = filter
     if (filter) {
       const whereObj = {}
 

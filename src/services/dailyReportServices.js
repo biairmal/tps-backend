@@ -1,4 +1,5 @@
 const { DailyReport, SoldItem } = require('../models')
+const { parseSequelizeOptions } = require('../helpers')
 
 exports.createDate = async () => {
   const now = new Date()
@@ -10,37 +11,43 @@ exports.createDate = async () => {
   }
 
   const newDailyReport = await DailyReport.create({ date: now })
+
   return newDailyReport
+}
+
+exports.getDailyReports = async (query) => {
+  const options = parseSequelizeOptions(query)
+
+  return DailyReport.findAll(options)
 }
 
 exports.calculateDailyReport = async () => {
   const now = new Date()
   const yesterday = new Date(now - 24 * 60 * 60 * 1000)
+
   const dailyReport = await DailyReport.findOne({ where: { date: yesterday } })
 
-  if (!dailyReport) return 0
+  if (!dailyReport) return null
 
   const soldItems = await SoldItem.findAll({
     where: { dateId: dailyReport.id },
   })
-  const soldItemsPromise = soldItems.map(async (soldItem) => {
-    let info = await soldItem.getItem()
-    info = info.toJSON()
-    const itemInfo = { ...info, ...{ quantity: soldItem.quantity } }
-    return itemInfo
-  })
 
-  const resolvedPromises = await Promise.all(soldItemsPromise)
   let productsSold = 0
   let grossProfit = 0
   let totalCogs = 0
-  resolvedPromises.forEach((item) => {
+  let countTransactions = 0
+  const transactionsId = []
+
+  soldItems.forEach((item) => {
+    if (!transactionsId.includes(item.transactionId)) {
+      transactionsId.push(item.transactionId)
+      countTransactions += 1
+    }
     productsSold += item.quantity
-    // INI HARUS SESUAI HARGA SIAPA YANG BELI
-    grossProfit += item.normalPrice
-    totalCogs += item.cogs
+    grossProfit += item.quantity * item.priceATT
+    totalCogs += item.quantity * item.cogsATT
   })
-  const countTransactions = new Set(resolvedPromises).size
 
   const updatedDailyReport = await dailyReport.update({
     transactions: countTransactions,
@@ -48,13 +55,8 @@ exports.calculateDailyReport = async () => {
     soldItems: productsSold,
     totalCogs,
   })
+
   return updatedDailyReport
-}
-
-exports.getDailyReports = async () => {
-  const data = await DailyReport.findAll({})
-
-  return data
 }
 
 exports.getThisMonthStats = async () => {}

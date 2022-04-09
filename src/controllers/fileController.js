@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const response = require('../utils/reponse')
 
 const baseUrl = 'http://localhost:8000/files/'
 
@@ -8,36 +9,33 @@ exports.getListFiles = (req, res) => {
 
   fs.readdir(directoryPath, (err, files) => {
     if (err) {
-      res.status(500).json({
-        success: false,
-        message: 'Failed to get files!',
-      })
-
-      const fileInfos = []
-      files.forEach((file) => {
-        fileInfos.push({
-          name: file,
-          url: baseUrl + file,
-        })
-      })
-
-      res.status(200).json({
-        success: true,
-        message: 'Successfully retrieved files!',
-        data: fileInfos,
-      })
+      return response.internal_server_error(
+        res,
+        undefined,
+        'Failed to retrieve files!'
+      )
     }
+
+    const fileInfos = []
+
+    files.forEach((file) => {
+      fileInfos.push({
+        name: file,
+        url: baseUrl + file,
+      })
+    })
+
+    return response.success(res, fileInfos, 'Successfully retrieved files!')
   })
 }
 
 exports.downloadFile = (req, res) => {
   const fileName = req.params.name
   const directoryPath = path.join(__dirname, '../../invoices/')
-  res.download(directoryPath + fileName, fileName, (err) => {
+
+  return res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
-      res.status(500).send({
-        message: `Could not download the file. + ${err}`,
-      })
+      response.internal_server_error(res, err, 'Could not download file!')
     }
   })
 }

@@ -1,20 +1,38 @@
+const response = require('../utils/reponse')
 const { dailyReportServices } = require('../services')
 
 exports.createDate = async (req, res) => {
   try {
     const data = await dailyReportServices.createDate()
 
-    return res.status(201).json({
-      success: true,
-      message: 'Successfully created date!',
-      data,
-    })
+    return response.created(res, data, 'Successfully created daily report!')
   } catch (error) {
     console.log(error)
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to create date',
-    })
+
+    if (error.message === 'Already exists')
+      return response.conflict(res, undefined, 'Date already exists!')
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to create daily report!'
+    )
+  }
+}
+
+exports.getDailyReports = async (req, res) => {
+  try {
+    const data = await dailyReportServices.getDailyReports(req.query)
+
+    return response.success(res, data, 'Successfully retrieved daily reports!')
+  } catch (error) {
+    console.log(error)
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve daily reports!'
+    )
   }
 }
 
@@ -22,34 +40,17 @@ exports.calculateDailyReport = async (req, res) => {
   try {
     const data = await dailyReportServices.calculateDailyReport()
 
-    return res.status(201).json({
-      success: true,
-      message: 'Successfully calculated daily reports!',
-      data,
-    })
+    if (!data)
+      return response.not_found(res, undefined, 'Daily report not found!')
+
+    return response.success(res, data, 'Successfully updated daily report!')
   } catch (error) {
     console.log(error)
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to calculate daily reports!',
-    })
-  }
-}
 
-exports.getDailyReports = async (req, res) => {
-  try {
-    const data = await dailyReportServices.getDailyReports()
-
-    return res.status(201).json({
-      success: true,
-      message: 'Successfully retrieved daily reports!',
-      data,
-    })
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to retrieved daily reports!',
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to update daily reports!'
+    )
   }
 }

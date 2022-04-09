@@ -1,25 +1,21 @@
-const createError = require('http-errors')
-const { handleErrors, parseSequelizeOptions } = require('../helpers')
+const { parseSequelizeOptions } = require('../helpers')
 const { Buyer } = require('../models')
 
 exports.create = async (buyer, dbOptions = {}) => {
-  try {
-    const { name, phone, email, address } = buyer
+  const createdBuyer = await Buyer.create(
+    {
+      name: buyer.name,
+      phone: buyer.phone,
+      email: buyer.email,
+      zip: buyer.zip,
+      address: buyer.address,
+      city: buyer.city,
+      country: buyer.country,
+    },
+    dbOptions
+  )
 
-    const createdBuyer = await Buyer.create(
-      {
-        name,
-        phone,
-        email,
-        address,
-      },
-      dbOptions
-    )
-
-    return createdBuyer
-  } catch (error) {
-    throw handleErrors(error)
-  }
+  return createdBuyer
 }
 
 exports.get = async (query) => {
@@ -31,7 +27,19 @@ exports.get = async (query) => {
 exports.getById = async (id) => {
   const buyer = await Buyer.findByPk(id)
 
-  if (!buyer) throw createError(404, 'Buyer not found!')
+  if (!buyer) return null
+
+  return buyer
+}
+
+exports.updateById = async (id, updateData, dbOptions = {}) => {
+  const buyer = await Buyer.findByPk(id)
+
+  if (!buyer) return null
+
+  buyer.set(updateData)
+
+  await buyer.save(dbOptions)
 
   return buyer
 }
@@ -39,28 +47,9 @@ exports.getById = async (id) => {
 exports.deleteById = async (id) => {
   const buyer = await Buyer.findByPk(id)
 
-  if (!buyer) throw createError(404, 'Buyer not found!')
+  if (!buyer) return null
 
-  const deletedRow = await buyer.destroy()
+  await buyer.destroy()
 
-  return { deletedRow }
-}
-
-exports.updateById = async (id, updateData, dbOptions = {}) => {
-  try {
-    const buyer = await Buyer.findByPk(id)
-
-    if (!buyer) throw createError(404, 'Buyer not found!')
-
-    console.log(buyer)
-    buyer.set(updateData)
-    console.log(buyer)
-
-    const updatedBuyer = await buyer.save(dbOptions)
-
-    return updatedBuyer
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
+  return true
 }

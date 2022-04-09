@@ -1,9 +1,8 @@
 const { Router } = require('express')
 const multer = require('multer')
-const validateRequestSchema = require('../middlewares/validateRequestSchema')
-const checkRole = require('../middlewares/checkRole')
-const itemSchema = require('../validations/itemSchema')
-const itemController = require('../controllers/itemController')
+const { itemController } = require('../controllers')
+const { validateRequestSchema, checkRole } = require('../middlewares')
+const { itemSchema } = require('../validations')
 const { getStorage } = require('../utils/cloudinary')
 
 const storage = getStorage('items')

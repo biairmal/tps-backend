@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       date: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        // unique: true,
+        unique: true,
       },
       transactions: {
         type: DataTypes.INTEGER,
@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       soldItems: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0,
       },

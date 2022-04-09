@@ -1,26 +1,44 @@
-const userServices = require('../services/userServices')
+const response = require('../utils/reponse')
+const { userServices } = require('../services')
+const { handleUniqueViolation } = require('../helpers/handleSequelizeErrors')
 
 exports.createUser = async (req, res) => {
   try {
     const user = req.body
 
-    const data = await userServices.createUser(user)
+    const data = await userServices.create(user)
 
-    if (data.errors) throw data.errors
+    return response.created(res, data, 'Successfully created user!')
+  } catch (error) {
+    console.log(error)
 
-    res.status(201).json({
-      success: true,
-      message: 'Successfully created user!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const handledErrors = handleUniqueViolation(error)
 
-    res.status(statusCode).json({
-      success: false,
-      message: 'Failed to delete user!',
-      errors: errors.message,
-    })
+      return response.conflict(res, handledErrors, 'Failed to create user!')
+    }
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to create user!'
+    )
+  }
+}
+
+exports.getUsers = async (req, res) => {
+  try {
+    const data = await userServices.get(req.query)
+
+    return response.success(res, data, 'Successfully retrieved users!')
+  } catch (error) {
+    console.log(error)
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve users!'
+    )
   }
 }
 
@@ -28,70 +46,40 @@ exports.getUserById = async (req, res) => {
   try {
     const { id } = req.params
 
-    const data = await userServices.getUserById(id)
+    const data = await userServices.getById(id)
 
-    if (data.errors) throw data.errors
+    if (!data) return response.not_found(res, undefined, 'User not found!')
 
-    res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved user!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    return response.success(res, data, 'Successfully retrieved user!')
+  } catch (error) {
+    console.log(error)
 
-    res.status(statusCode).json({
-      success: false,
-      message: 'Failed to retrieve user!',
-      errors: errors.message,
-    })
-  }
-}
-
-exports.getUsers = async (req, res) => {
-  try {
-    const data = await userServices.getUsers(req.query)
-
-    if (data.errors) throw data.errors
-
-    res.status(200).json({
-      success: true,
-      message: 'Successfully retrieved users!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
-
-    res.status(statusCode).json({
-      success: false,
-      message: 'Failed to delete user!',
-      errors: errors.message,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve user!'
+    )
   }
 }
 
 exports.updateUserById = async (req, res) => {
   try {
     const { id } = req.params
-    const newData = req.body
+    const updateData = req.body
 
-    const data = await userServices.updateUserById(id, newData)
+    const data = await userServices.updateById(id, updateData)
 
-    if (data.errors) throw data.errors
+    if (!data) return response.not_found(res, undefined, 'User not found!')
 
-    res.status(200).json({
-      success: true,
-      message: 'Successfully updated user!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    return response.success(res, data, 'Successfully updated user!')
+  } catch (error) {
+    console.log(error)
 
-    res.status(statusCode).json({
-      success: false,
-      message: 'Failed to delete user!',
-      errors: errors.message,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to update users!'
+    )
   }
 }
 
@@ -99,22 +87,18 @@ exports.deleteUserById = async (req, res) => {
   try {
     const { id } = req.params
 
-    const data = await userServices.deleteUserById(id)
+    const data = await userServices.deleteById(id)
 
-    if (data.errors) throw data.errors
+    if (!data) return response.not_found(res, undefined, 'User not found!')
 
-    res.status(200).json({
-      success: true,
-      message: 'Successfully deleted user!',
-      data,
-    })
-  } catch (errors) {
-    const statusCode = errors.status || 500
+    return response.success(res, undefined, 'Successfully deleted user!')
+  } catch (error) {
+    console.log(error)
 
-    res.status(statusCode).json({
-      success: false,
-      message: 'Failed to delete user!',
-      errors: errors.message,
-    })
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to delete user!'
+    )
   }
 }

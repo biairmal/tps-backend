@@ -1,43 +1,27 @@
-const createError = require('http-errors')
-const handleErrors = require('../helpers/handleErrors')
 const { Item } = require('../models')
+const { parseSequelizeOptions } = require('../helpers')
 const { deleteCloudPicture } = require('../utils/cloudinary')
 
 exports.create = async (item) => {
-  try {
-    const result = await Item.create({
-      code: item.code,
-      name: item.name,
-      description: item.description,
-      picture: item.picture,
-      quantity: item.quantity,
-      cogs: item.cogs,
-      normalPrice: item.normalPrice,
-      dealerPrice: item.dealerPrice,
-      createdBy: item.createdBy,
-    })
+  const result = await Item.create({
+    code: item.code,
+    name: item.name,
+    description: item.description,
+    picture: item.picture,
+    quantity: item.quantity,
+    cogs: item.cogs,
+    normalPrice: item.normalPrice,
+    dealerPrice: item.dealerPrice,
+    discount: item.discount,
+    tax: item.tax,
+    createdBy: item.createdBy,
+  })
 
-    return result
-  } catch (errors) {
-    throw handleErrors(errors)
-  }
+  return result
 }
 
 exports.get = async (query) => {
-  const options = {}
-
-  if (query) {
-    const filter = JSON.parse(JSON.stringify(query))
-    if (query.limit) {
-      options.limit = parseInt(query.limit, 10)
-      delete filter.limit
-    }
-    if (query.page) {
-      options.offset = parseInt(query.limit, 10) * parseInt(query.page, 10)
-      delete filter.page
-    }
-    if (filter) options.where = filter
-  }
+  const options = parseSequelizeOptions(query)
 
   return Item.findAll(options)
 }
@@ -45,28 +29,33 @@ exports.get = async (query) => {
 exports.getById = async (id) => {
   const item = await Item.findByPk(id)
 
-  if (!item) throw createError(404, 'Item not found!')
-
-  return item
-}
-
-exports.deleteById = async (id) => {
-  const item = await this.getById(id)
-
-  if (item.picture) deleteCloudPicture(item.picture)
-
-  await item.destroy()
+  if (!item) return null
 
   return item
 }
 
 exports.updateById = async (id, data) => {
-  const item = await this.getById(id)
+  const item = await Item.findByPk(id)
+
+  if (!item) return null
 
   if (item.picture) deleteCloudPicture(item.picture)
 
   item.set(data)
+
   await item.save()
 
   return item
+}
+
+exports.deleteById = async (id) => {
+  const item = await Item.findByPk(id)
+
+  if (!item) return null
+
+  if (item.picture) deleteCloudPicture(item.picture)
+
+  await item.destroy()
+
+  return true
 }

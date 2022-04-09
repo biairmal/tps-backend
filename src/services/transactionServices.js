@@ -4,74 +4,86 @@ const { Transaction, Item, SoldItem, DailyReport } = require('../models')
 const { parseSequelizeOptions } = require('../helpers')
 const generateInvoice = require('../utils/invoice')
 
-const getBuyerInfo = async (buyer, options = {}) => {
+const findOrCreateBuyer = async (buyer, options = {}) => {
   if (!buyer.id) {
     const createdBuyer = await buyerServices.create(buyer, options)
+
     return createdBuyer
   }
 
   return buyerServices.getById(buyer.id)
 }
 
-const processItems = async (items, data, options) => {
+const processItems = async (data, transactionId, options = {}) => {
+  const { items } = data
+  const now = new Date()
+  const [date] = await DailyReport.findOrCreate({
+    ...options,
+    ...{ where: { date: now } },
+  })
+  const dateId = date.id
+
   let totalProducts = 0
   let totalQuantity = 0
   let subtotalPrice = 0
   let totalPrice = 0
 
-  const itemPromises = items.map(async (item) => {
+  const itemsArrayPromises = items.map(async (item) => {
     const thisItem = await Item.findByPk(item.id)
-    thisItem.decrement('quantity', {
-      ...options,
-      by: item.quantity,
-    })
-    const itemJSON = thisItem.toJSON()
-    const itemInfo = { ...itemJSON, ...{ quantity: item.quantity } }
-    return itemInfo
-  })
 
-  const itemsInfo = await Promise.all(itemPromises)
+    if (!thisItem) return null
 
-  const itemsArray = itemsInfo.map((item) => {
-    totalProducts += 1
-    totalQuantity += item.quantity
-    const price =
-      data.customerType === 'dealer' ? item.dealerPrice : item.normalPrice
-    subtotalPrice += price
-    const itemObj = {
-      quantity: item.quantity,
-      name: item.name,
-      tax: item.tax,
-      price,
-    }
-    return itemObj
-  })
+    let price =
+      String(data.customerType).toLowerCase() === 'dealer'
+        ? thisItem.dealerPrice
+        : thisItem.normalPrice
 
-  totalPrice = subtotalPrice * (100 - data.discount / 100)
+    if (thisItem.discount > 0) price = (price * (100 - thisItem.discount)) / 100
 
-  return { totalProducts, totalQuantity, subtotalPrice, totalPrice, itemsArray }
-}
-
-const addToSoldItems = async (items, transactionId, options = {}) => {
-  const now = new Date()
-  const [date] = await DailyReport.findOrCreate({ where: { date: now } })
-  const dateId = date.id
-
-  const soldItemsPromises = items.map(async (item) => {
-    const [soldItem] = await SoldItem.upsert(
+    // add to sold items
+    await SoldItem.create(
       {
         itemId: item.id,
         quantity: item.quantity,
+        priceATT: price,
+        cogsATT: thisItem.cogs,
         dateId,
         transactionId,
       },
       options
     )
-    return soldItem
+
+    // decrement stock
+    await thisItem.decrement('quantity', {
+      ...options,
+      by: item.quantity,
+    })
+
+    const thisItemObj = {
+      id: item.id,
+      quantity: item.quantity,
+      name: thisItem.name,
+      tax: thisItem.tax,
+      price,
+    }
+
+    totalProducts += 1
+    totalQuantity += item.quantity
+    subtotalPrice += price
+    totalPrice += (price * (100 + thisItem.tax)) / 100
+
+    return thisItemObj
   })
 
-  const soldItems = await Promise.all(soldItemsPromises)
-  return soldItems
+  const itemsArray = await Promise.all(itemsArrayPromises)
+
+  return {
+    itemsArray,
+    totalProducts,
+    totalQuantity,
+    subtotalPrice,
+    totalPrice,
+  }
 }
 
 exports.createTransaction = async (data) => {
@@ -79,48 +91,42 @@ exports.createTransaction = async (data) => {
   const options = { transaction: dbTransaction }
 
   try {
-    const { buyer, items } = data
+    const transaction = await Transaction.create({}, options)
 
-    const buyerInfo = await getBuyerInfo(buyer, data, options)
+    const buyerInfo = await findOrCreateBuyer(data.buyer, options)
+
     const {
+      itemsArray,
       totalProducts,
       totalQuantity,
       subtotalPrice,
       totalPrice,
-      itemsArray,
-    } = await processItems(items, data, options)
+    } = await processItems(data, transaction.id, options)
 
-    // create transaction
-    const createdTransaction = await Transaction.create(
-      {
-        totalProducts,
-        totalQuantity,
-        subtotalPrice,
-        totalPrice,
-        discount: data.discount,
-        tax: data.tax,
-        notes: data.notes,
-        cashier: data.cashier,
-        buyerId: buyerInfo.id,
-      },
-      options
-    )
+    transaction.set({
+      totalProducts,
+      totalQuantity,
+      subtotalPrice,
+      totalPrice,
+      notes: data.notes,
+      cashier: data.cashier,
+      buyerId: buyerInfo.id,
+    })
 
-    await addToSoldItems(items, createdTransaction.id, options)
+    await transaction.save(options)
 
     await dbTransaction.commit()
 
     const invoiceData = {
       buyer: buyerInfo.toJSON(),
       items: itemsArray,
-      transactionId: createdTransaction.id
+      transactionId: transaction.id,
     }
 
     generateInvoice(invoiceData)
 
-    return createdTransaction
+    return transaction
   } catch (error) {
-    console.log(error)
     dbTransaction.rollback()
     throw error
   }

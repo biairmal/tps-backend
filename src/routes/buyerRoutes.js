@@ -1,7 +1,7 @@
 const { Router } = require('express')
-const validateRequestSchema = require('../middlewares/validateRequestSchema')
-const { buyerSchema } = require('../validations')
 const { buyerController } = require('../controllers')
+const { validateRequestSchema } = require('../middlewares')
+const { buyerSchema } = require('../validations')
 
 const router = Router()
 

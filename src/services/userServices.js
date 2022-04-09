@@ -1,91 +1,58 @@
-const createError = require('http-errors')
 const bcrypt = require('bcrypt')
 const { User } = require('../models')
+const { parseSequelizeOptions } = require('../helpers')
 
-exports.createUser = async (user) => {
-  try {
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(user.password, salt)
+exports.create = async (user) => {
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(user.password, salt)
 
-    let createdUser = await User.create({
-      id: user.id,
-      username: user.username,
-      password: hashedPassword,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      role: user.role,
-    })
+  let createdUser = await User.create({
+    id: user.id,
+    username: user.username,
+    password: hashedPassword,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    role: String(user.role).toLowerCase(),
+  })
 
-    createdUser = createdUser.toJSON()
-    delete createdUser.password
+  createdUser = createdUser.toJSON()
+  delete createdUser.password
 
-    return createdUser
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
+  return createdUser
 }
 
-exports.getUserById = async (id) => {
-  try {
-    const user = await User.findByPk(id)
-
-    if (!user) throw createError(404, 'User not found!')
-
-    return user
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
-}
-
-exports.getUsers = async (query) => {
-  const options = {}
-
-  if (query) {
-    const filter = JSON.parse(JSON.stringify(query))
-    if (query.limit) {
-      options.limit = parseInt(query.limit, 10)
-      delete filter.limit
-    }
-    if (query.page) {
-      options.offset = parseInt(query.limit, 10) * parseInt(query.page, 10)
-      delete filter.page
-    }
-    if (filter) options.where = filter
-  }
+exports.get = async (query) => {
+  const options = parseSequelizeOptions(query)
 
   return User.findAll(options)
 }
 
-exports.updateUserById = async (id, dataToUpdate) => {
-  try {
-    const user = await User.findByPk(id)
+exports.getById = async (id) => {
+  const user = await User.findByPk(id)
 
-    if (!user) throw createError(404, 'User not found!')
+  if (!user) return null
 
-    const updatedUser = await user.update(dataToUpdate)
-
-    return updatedUser
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
+  return user
 }
 
-exports.deleteUserById = async (id) => {
-  try {
-    const result = {}
-    const user = await User.findByPk(id)
+exports.updateById = async (id, updateData) => {
+  const user = await User.findByPk(id)
 
-    if (!user) throw createError(404, 'User not found!')
+  if (!user) return null
 
-    const deletedRow = await User.destroy({ where: { id } })
-    if (deletedRow > 0) result.deletedUsername = user.username
+  user.set(updateData)
 
-    return result
-  } catch (error) {
-    console.log(error)
-    throw error
-  }
+  await user.save()
+
+  return user
+}
+
+exports.deleteById = async (id) => {
+  const user = await User.findByPk(id)
+
+  if (!user) return null
+
+  await user.destroy()
+
+  return true
 }
