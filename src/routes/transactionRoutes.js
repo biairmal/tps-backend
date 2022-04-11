@@ -1,13 +1,17 @@
 const { Router } = require('express')
 const { transactionController } = require('../controllers')
-// const validateRequestSchema = require('../middlewares/validateRequestSchema')
-// const itemSchema = require('../validations/itemSchema')
+const validateRequestSchema = require('../middlewares/validateRequestSchema')
+const { transactionSchema } = require('../validations')
 
 const router = Router()
 
 router
   .route('/transactions')
   .get(transactionController.getTransactions)
-  .post(transactionController.createTransaction)
+  .post(
+    transactionSchema.createTransactionSchema,
+    validateRequestSchema,
+    transactionController.createTransaction
+  )
 
 module.exports = router

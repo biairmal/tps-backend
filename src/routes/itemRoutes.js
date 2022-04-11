@@ -12,9 +12,12 @@ const router = Router()
 
 router
   .route('/items')
-  .get(checkRole(['admin', 'distributor', 'dealer']), itemController.getItems)
+  .get(
+    // checkRole(['admin', 'distributor', 'dealer']),
+    itemController.getItems
+  )
   .post(
-    checkRole(['admin', 'distributor']),
+    // checkRole(['admin', 'distributor']),
     upload.single('picture'),
     itemSchema.createItemSchema,
     validateRequestSchema,
@@ -24,13 +27,18 @@ router
 router
   .route('/items/:id')
   .get(
-    checkRole(['admin', 'distributor', 'dealer']),
+    // checkRole(['admin', 'distributor', 'dealer']),
     itemController.getItemById
   )
-  .delete(checkRole(['admin', 'distributor']), itemController.deleteItemById)
+  .delete(
+    // checkRole(['admin', 'distributor']),
+    itemController.deleteItemById
+  )
   .put(
-    checkRole(['admin', 'distributor']),
+    // checkRole(['admin', 'distributor']),
     upload.single('picture'),
+    itemSchema.updateItemSchema,
+    validateRequestSchema,
     itemController.updateItemById
   )
 

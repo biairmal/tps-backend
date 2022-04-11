@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon src/index.js",
-    "test": "mocha 'test/**/*.js' --recursive --timeout 60000 --exit",
+    "test": "mocha 'test/**/*.test.js' --recursive --timeout 60000 --exit",
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "lint:check": "eslint .",

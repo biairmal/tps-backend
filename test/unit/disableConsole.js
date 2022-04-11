@@ -1,9 +1,11 @@
 module.exports = () => {
-  beforeEach(() => {
-    console.log = function () {}
-  })
+  // before((done) => {
+  //   console.log = function () {}
+  //   done()
+  // })
 
-  afterEach(() => {
-    delete console.log
-  })
+  // after((done) => {
+  //   delete console.log
+  //   done()
+  // })
 }

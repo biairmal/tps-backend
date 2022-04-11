@@ -72,7 +72,7 @@ exports.updateItemById = async (req, res) => {
 
     if (!data) return response.not_found(res, undefined, 'Item not found!')
 
-    return response.success(res, undefined, 'Successfully updated item!')
+    return response.success(res, data, 'Successfully updated item!')
   } catch (error) {
     console.log(error)
 
