@@ -10,9 +10,11 @@ const createUserSchema = [
     .bail()
     .matches(/^[A-Za-z0-9]+$/)
     .withMessage('username can only contains alphabets and numbers'),
-  body('password')
+    body('password')
     .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('password can not be blank'),
+    .withMessage('password can not be blank')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
   body('firstName')
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('firstName can not be blank'),
@@ -38,8 +40,8 @@ const updateUserSchema = [
     .withMessage('username can only contains alphabets and numbers'),
   body('password')
     .optional()
-    .exists({ checkFalsy: true, checkNull: true })
-    .withMessage('password can not be blank'),
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters long'),
   body('firstName')
     .optional()
     .exists({ checkFalsy: true, checkNull: true })

@@ -1,5 +1,5 @@
 const { Item } = require('../models')
-const { parseSequelizeOptions } = require('../helpers')
+const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const { deleteCloudPicture } = require('../utils/cloudinary')
 
 exports.create = async (item) => {
@@ -23,7 +23,15 @@ exports.create = async (item) => {
 exports.get = async (query) => {
   const options = parseSequelizeOptions(query)
 
-  return Item.findAll(options)
+  const items = await Item.findAll(options)
+  const cursor = await getCursorData(Item, query)
+
+  const data = {
+    edge: items,
+    cursor,
+  }
+
+  return data
 }
 
 exports.getById = async (id) => {

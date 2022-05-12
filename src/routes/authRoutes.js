@@ -7,9 +7,17 @@ router.post(
   '/login',
   passport.authenticate('local', { failureMessage: true }),
   (req, res) => {
+    const data = {
+      id: req.user.id,
+      username: req.user.username,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      role: req.user.role,
+    }
     res.status(200).json({
       success: true,
       message: 'Log in success!',
+      data,
     })
   }
 )

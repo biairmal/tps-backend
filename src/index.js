@@ -1,5 +1,6 @@
 // Required modules
 require('dotenv').config()
+const cors = require('cors')
 const express = require('express')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
@@ -16,9 +17,15 @@ const port = process.env.PORT || 8000
 const sessionStore = new SequelizeStore({
   db: sequelize,
 })
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN,
+  credentials: true, // access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+}
 sessionStore.sync()
 
 // Middleware
+app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(session(sessionConfig(sessionStore)))

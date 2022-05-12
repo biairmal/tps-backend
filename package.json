@@ -26,6 +26,7 @@
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.29.0",
     "connect-session-sequelize": "^7.1.2",
+    "cors": "^2.8.5",
     "cron": "^1.8.2",
     "dotenv": "^16.0.0",
     "easyinvoice": "^2.3.0",
