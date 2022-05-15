@@ -1,10 +1,15 @@
 /* eslint-disable no-unused-vars */
+const bcrypt = require('bcrypt')
+
 module.exports = {
-  up: async (queryInterface, Sequelize) =>
-    queryInterface.bulkInsert('Users', [
+  up: async (queryInterface, Sequelize) => {
+    const salt = await bcrypt.genSalt(10)
+    const password = await bcrypt.hash('seededuser', salt)
+
+    return queryInterface.bulkInsert('Users', [
       {
         username: 'seededuser1',
-        password: 'seededuser',
+        password,
         firstName: 'Distributor',
         lastName: 'One',
         role: 'distributor',
@@ -13,7 +18,7 @@ module.exports = {
       },
       {
         username: 'seededuser2',
-        password: 'seededuser',
+        password,
         firstName: 'Admin',
         lastName: 'One',
         role: 'admin',
@@ -22,7 +27,7 @@ module.exports = {
       },
       {
         username: 'seededuser3',
-        password: 'seededuser',
+        password,
         firstName: 'Admin',
         lastName: 'Two',
         role: 'admin',
@@ -31,7 +36,7 @@ module.exports = {
       },
       {
         username: 'seededuser4',
-        password: 'seededuser',
+        password,
         firstName: 'Dealer',
         lastName: 'One',
         role: 'dealer',
@@ -40,15 +45,15 @@ module.exports = {
       },
       {
         username: 'seededuser5',
-        password: 'seededuser',
+        password,
         firstName: 'Dealer',
         lastName: 'Two',
         role: 'dealer',
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ]),
-
+    ])
+  },
   down: (queryInterface, Sequelize) =>
     queryInterface.bulkDelete('Users', null, {}),
 }
