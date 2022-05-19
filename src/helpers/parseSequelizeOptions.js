@@ -21,7 +21,7 @@ module.exports = (query) => {
 
       Object.keys(filter).forEach((field) => {
         const fieldValue = filter[field]
-        whereObj[field] = { [Op.like]: `%${fieldValue}%` }
+        whereObj[field] = { [Op.iLike]: `%${fieldValue}%` }
       })
       options.where = whereObj
     }

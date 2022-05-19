@@ -1,7 +1,7 @@
 const { sequelize } = require('../utils/database')
 const buyerServices = require('./buyerServices')
 const { Transaction, Item, SoldItem, DailyReport } = require('../models')
-const { parseSequelizeOptions } = require('../helpers')
+const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const generateInvoice = require('../utils/invoice')
 
 const findOrCreateBuyer = async (buyer, options = {}) => {
@@ -135,5 +135,11 @@ exports.createTransaction = async (data) => {
 exports.getTransactions = async (query) => {
   const options = parseSequelizeOptions(query)
 
-  return Transaction.findAll(options)
+  const transactions = await Transaction.findAll(options)
+  const cursor = await getCursorData(Transaction, query)
+
+  return {
+    cursor,
+    edge: transactions,
+  }
 }

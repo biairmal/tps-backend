@@ -1,4 +1,4 @@
-const response = require('../utils/reponse')
+const response = require('../utils/response')
 const { dailyReportServices } = require('../services')
 
 exports.createDate = async (req, res) => {

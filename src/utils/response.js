@@ -113,3 +113,12 @@ exports.success = (res, data, message = 'Success') =>
  */
 exports.created = (res, data, message = 'Created') =>
   responseHandler(res, 201, true, data, message, undefined)
+
+/**
+ * No Content
+ * The request has succeeded and a new resource has been created as a result
+ * @param res response object
+= * @param message description
+ */
+exports.no_content = (res, message = 'No Content') =>
+  responseHandler(res, 204, true, undefined, message, undefined)

@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const response = require('../utils/reponse')
+const response = require('../utils/response')
 
 const baseUrl = 'http://localhost:8000/files/'
 

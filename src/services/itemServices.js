@@ -1,3 +1,4 @@
+const { Op } = require('sequelize')
 const { Item } = require('../models')
 const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const { deleteCloudPicture } = require('../utils/cloudinary')
@@ -22,6 +23,17 @@ exports.create = async (item) => {
 
 exports.get = async (query) => {
   const options = parseSequelizeOptions(query)
+
+  if (query.search) {
+    delete options.where
+    const where = {
+      [Op.or]: [
+        { code: { [Op.iLike]: `%${query.search}%` } },
+        { name: { [Op.iLike]: `%${query.search}%` } },
+      ],
+    }
+    options.where = where
+  }
 
   const items = await Item.findAll(options)
   const cursor = await getCursorData(Item, query)

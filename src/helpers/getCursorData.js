@@ -18,7 +18,7 @@ module.exports = async (model, query) => {
   return {
     hasNext,
     hasPrev,
-    size: query.limit,
+    size: parseInt(query.limit, 10),
     totalPages,
     totalRows,
   }

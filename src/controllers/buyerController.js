@@ -1,4 +1,4 @@
-const response = require('../utils/reponse')
+const response = require('../utils/response')
 const { buyerServices } = require('../services')
 
 exports.createBuyer = async (req, res) => {

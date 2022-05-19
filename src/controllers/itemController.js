@@ -1,4 +1,4 @@
-const response = require('../utils/reponse')
+const response = require('../utils/response')
 const { itemServices } = require('../services')
 const { handleUniqueViolation } = require('../helpers/handleSequelizeErrors')
 

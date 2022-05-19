@@ -1,6 +1,6 @@
 const { Router } = require('express')
 const { userController } = require('../controllers')
-const { validateRequestSchema } = require('../middlewares')
+const { checkRole, validateRequestSchema } = require('../middlewares')
 const { userSchema } = require('../validations')
 
 const router = Router()
@@ -8,17 +8,19 @@ const router = Router()
 router
   .route('/users')
   .post(
+    checkRole('distributor'),
     userSchema.createUserSchema,
     validateRequestSchema,
     userController.createUser
   )
-  .get(userController.getUsers)
+  .get(checkRole('distributor'), userController.getUsers)
 
 router
   .route('/users/:id')
-  .get(userController.getUserById)
-  .delete(userController.deleteUserById)
+  .get(checkRole('distributor'), userController.getUserById)
+  .delete(checkRole('distributor'), userController.deleteUserById)
   .put(
+    checkRole('distributor'),
     userSchema.updateUserSchema,
     validateRequestSchema,
     userController.updateUserById

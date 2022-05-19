@@ -1,15 +1,11 @@
-const bcrypt = require('bcrypt')
 const { User } = require('../models')
 const { parseSequelizeOptions, getCursorData } = require('../helpers')
 
 exports.create = async (user) => {
-  const salt = await bcrypt.genSalt(10)
-  const hashedPassword = await bcrypt.hash(user.password, salt)
-
   let createdUser = await User.create({
     id: user.id,
     username: user.username,
-    password: hashedPassword,
+    password: user.password,
     firstName: user.firstName,
     lastName: user.lastName,
     role: String(user.role).toLowerCase(),
@@ -52,7 +48,32 @@ exports.updateById = async (id, updateData) => {
 
   await user.save()
 
-  return user
+  const userJSON = user.toJSON()
+  delete userJSON.password
+
+  return userJSON
+}
+
+exports.updateProfile = async (id, data) => {
+  const user = await User.findByPk(id)
+  const updateData = data
+
+  if (!user) return null
+
+  if (updateData.role) delete updateData.role
+  if (updateData.username) delete updateData.username
+
+  console.log(updateData)
+
+  if (Object.keys(updateData).length < 1) return 204
+
+  user.set(updateData)
+
+  await user.save()
+
+  const userJSON = user.toJSON()
+
+  return userJSON
 }
 
 exports.deleteById = async (id) => {
