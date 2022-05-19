@@ -1,5 +1,11 @@
-module.exports = async (model, query) => {
-  const totalRows = await model.count()
+module.exports = async (model, query, options = {}) => {
+  let totalRows = 0
+  if (Object.keys(options).length > 0) {
+    totalRows = await model.count(options)
+    totalRows = totalRows.length
+  } else {
+    totalRows = await model.count()
+  }
 
   if (!query.limit) {
     return {

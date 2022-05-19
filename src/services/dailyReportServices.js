@@ -1,5 +1,6 @@
+const sequelize = require('sequelize')
 const { DailyReport, SoldItem } = require('../models')
-const { parseSequelizeOptions } = require('../helpers')
+const { getCursorData, parseSequelizeOptions } = require('../helpers')
 
 exports.createDate = async () => {
   const now = new Date()
@@ -18,7 +19,56 @@ exports.createDate = async () => {
 exports.getDailyReports = async (query) => {
   const options = parseSequelizeOptions(query)
 
-  return DailyReport.findAll(options)
+  const availableDateGroup = ['day', 'month', 'year']
+
+  let groupDateBy = 'day'
+
+  if (query.groupBy) {
+    delete options.where.groupBy
+    if (availableDateGroup.includes(query.groupBy.toLowerCase()))
+      groupDateBy = query.groupBy
+  }
+
+  options.order = [
+    [sequelize.fn('date_trunc', groupDateBy, sequelize.col('date')), 'DESC'],
+  ]
+  options.attributes = [
+    [sequelize.fn('date_trunc', groupDateBy, sequelize.col('date')), 'date'],
+    [
+      sequelize.cast(sequelize.fn('sum', sequelize.col('transactions')), 'int'),
+      'transactions',
+    ],
+    [
+      sequelize.cast(sequelize.fn('sum', sequelize.col('soldItems')), 'int'),
+      'soldItems',
+    ],
+    [
+      sequelize.cast(sequelize.fn('sum', sequelize.col('totalCogs')), 'float'),
+      'totalCogs',
+    ],
+    [
+      sequelize.cast(
+        sequelize.fn('sum', sequelize.col('grossProfit')),
+        'float'
+      ),
+      'grossProfit',
+    ],
+  ]
+  options.group = [
+    sequelize.fn('date_trunc', groupDateBy, sequelize.col('date')),
+  ]
+
+  const dailyReports = await DailyReport.findAll(options)
+  const cursor = await getCursorData(DailyReport, query, {
+    group: [sequelize.fn('date_trunc', groupDateBy, sequelize.col('date'))],
+  })
+
+  const data = {
+    edge: dailyReports,
+    cursor,
+  }
+
+  return data
 }
 
 exports.calculateDailyReport = async () => {
