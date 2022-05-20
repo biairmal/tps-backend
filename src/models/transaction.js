@@ -38,6 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       notes: {
         type: DataTypes.TEXT,
       },
+      invoice: {
+        type: DataTypes.TEXT,
+      },
     },
     {
       sequelize,

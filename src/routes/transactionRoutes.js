@@ -1,14 +1,18 @@
 const { Router } = require('express')
 const { transactionController } = require('../controllers')
-const validateRequestSchema = require('../middlewares/validateRequestSchema')
+const { checkRole, validateRequestSchema } = require('../middlewares')
 const { transactionSchema } = require('../validations')
 
 const router = Router()
 
 router
   .route('/transactions')
-  .get(transactionController.getTransactions)
+  .get(
+    checkRole(['distributor', 'admin']),
+    transactionController.getTransactions
+  )
   .post(
+    checkRole(['distributor', 'admin', 'dealer']),
     transactionSchema.createTransactionSchema,
     validateRequestSchema,
     transactionController.createTransaction

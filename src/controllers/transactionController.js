@@ -3,7 +3,7 @@ const { transactionServices } = require('../services')
 
 exports.createTransaction = async (req, res) => {
   try {
-    const data = await transactionServices.createTransaction(req.body)
+    const data = await transactionServices.createTransaction(req.body, req.user)
 
     return response.created(res, data, 'Successfully created transaction!')
   } catch (error) {

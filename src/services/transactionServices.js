@@ -4,118 +4,91 @@ const { Transaction, Item, SoldItem, DailyReport } = require('../models')
 const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const generateInvoice = require('../utils/invoice')
 
-const findOrCreateBuyer = async (buyer, options = {}) => {
-  if (!buyer.id) {
-    const createdBuyer = await buyerServices.create(buyer, options)
+exports.createTransaction = async (data, user) => {
+  const { buyer, items, notes } = data
 
-    return createdBuyer
-  }
-
-  return buyerServices.getById(buyer.id)
-}
-
-const processItems = async (data, transactionId, options = {}) => {
-  const { items } = data
-  const now = new Date()
-  const [date] = await DailyReport.findOrCreate({
-    ...options,
-    ...{ where: { date: now } },
-  })
-  const dateId = date.id
-
-  let totalProducts = 0
-  let totalQuantity = 0
-  let subtotalPrice = 0
-  let totalPrice = 0
-
-  const itemsArrayPromises = items.map(async (item) => {
-    const thisItem = await Item.findByPk(item.id)
-
-    if (!thisItem) return null
-
-    let price =
-      String(data.customerType).toLowerCase() === 'dealer'
-        ? thisItem.dealerPrice
-        : thisItem.normalPrice
-
-    if (thisItem.discount > 0) price = (price * (100 - thisItem.discount)) / 100
-
-    // add to sold items
-    await SoldItem.create(
-      {
-        itemId: item.id,
-        quantity: item.quantity,
-        priceATT: price,
-        cogsATT: thisItem.cogs,
-        dateId,
-        transactionId,
-      },
-      options
-    )
-
-    // decrement stock
-    await thisItem.decrement('quantity', {
-      ...options,
-      by: item.quantity,
-    })
-
-    const thisItemObj = {
-      id: item.id,
-      quantity: item.quantity,
-      name: thisItem.name,
-      tax: thisItem.tax,
-      price,
-    }
-
-    totalProducts += 1
-    totalQuantity += item.quantity
-    subtotalPrice += price
-    totalPrice += (price * (100 + thisItem.tax)) / 100
-
-    return thisItemObj
-  })
-
-  const itemsArray = await Promise.all(itemsArrayPromises)
-
-  return {
-    itemsArray,
-    totalProducts,
-    totalQuantity,
-    subtotalPrice,
-    totalPrice,
-  }
-}
-
-exports.createTransaction = async (data) => {
   const dbTransaction = await sequelize.transaction()
   const options = { transaction: dbTransaction }
 
   try {
     const transaction = await Transaction.create({}, options)
 
-    const buyerInfo = await findOrCreateBuyer(data.buyer, options)
+    // find or create buyer
+    let buyerInfo
 
-    const {
-      itemsArray,
-      totalProducts,
-      totalQuantity,
-      subtotalPrice,
-      totalPrice,
-    } = await processItems(data, transaction.id, options)
+    if (!buyer.id) {
+      buyerInfo = await buyerServices.create(buyer, options)
+    } else {
+      buyerInfo = await buyerServices.getById(buyer.id)
+    }
 
-    transaction.set({
-      totalProducts,
-      totalQuantity,
-      subtotalPrice,
-      totalPrice,
-      notes: data.notes,
-      cashier: data.cashier,
-      buyerId: buyerInfo.id,
+    const now = new Date()
+    const [date] = await DailyReport.findOrCreate({
+      ...options,
+      ...{ where: { date: now } },
     })
 
-    await transaction.save(options)
+    // process items
+    const buyQuantity = {}
+    const selectedItem = []
 
-    await dbTransaction.commit()
+    items.forEach((item) => {
+      buyQuantity[item.id] = item.quantity
+      selectedItem.push(item.id)
+    })
+
+    const itemsInfo = await Item.findAll({ where: { id: selectedItem } })
+    itemsInfo.forEach((item) => {
+      if (item.quantity < buyQuantity[item.id])
+        throw new Error('Insufficient item quantity!')
+    })
+
+    let totalProducts = 0
+    let totalQuantity = 0
+    let subtotalPrice = 0
+    let totalPrice = 0
+
+    const itemsArrayPromises = itemsInfo.map(async (item) => {
+      let price =
+        String(buyer.customerType).toLowerCase() === 'dealer'
+          ? item.dealerPrice
+          : item.normalPrice
+
+      if (item.discount > 0 && item.discount <= 100)
+        price = (price * (100 - item.discount)) / 100
+
+      totalProducts += 1
+      totalQuantity += buyQuantity[item.id]
+      subtotalPrice += price
+      totalPrice += (price * (100 + item.tax)) / 100
+
+      await SoldItem.create(
+        {
+          itemId: item.id,
+          quantity: buyQuantity[item.id],
+          priceATT: price,
+          cogsATT: item.cogs,
+          dateId: date.id,
+          transactionId: transaction.id,
+        },
+        options
+      )
+
+      // decrement stock
+      await item.decrement('quantity', {
+        ...options,
+        by: buyQuantity[item.id],
+      })
+
+      return {
+        name: item.name,
+        price,
+        quantity: buyQuantity[item.id],
+        tax: item.tax,
+      }
+    })
+
+    const itemsArray = await Promise.all(itemsArrayPromises)
 
     const invoiceData = {
       buyer: buyerInfo.toJSON(),
@@ -123,11 +96,29 @@ exports.createTransaction = async (data) => {
       transactionId: transaction.id,
     }
 
-    generateInvoice(invoiceData)
+    const invoicePath = await generateInvoice(invoiceData)
+
+    transaction.set({
+      totalProducts,
+      totalQuantity,
+      subtotalPrice,
+      totalPrice,
+      notes,
+      cashierId: user.id,
+      buyerId: buyerInfo.id,
+      invoice: invoicePath,
+    })
+
+    await transaction.save(options)
+
+    await dbTransaction.commit()
 
     return transaction
   } catch (error) {
+    console.log(error)
+
     dbTransaction.rollback()
+
     throw error
   }
 }
