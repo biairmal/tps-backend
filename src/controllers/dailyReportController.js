@@ -54,3 +54,23 @@ exports.calculateDailyReport = async (req, res) => {
     )
   }
 }
+
+exports.getThisMonthStats = async (req, res) => {
+  try {
+    const data = await dailyReportServices.getThisMonthStats()
+
+    return response.success(
+      res,
+      data,
+      'Successfully retrieved this month summary!'
+    )
+  } catch (error) {
+    console.log(error)
+
+    return response.internal_server_error(
+      res,
+      undefined,
+      'Failed to retrieve this month summary!'
+    )
+  }
+}

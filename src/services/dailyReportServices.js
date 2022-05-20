@@ -109,4 +109,48 @@ exports.calculateDailyReport = async () => {
   return updatedDailyReport
 }
 
-exports.getThisMonthStats = async () => {}
+exports.getThisMonthStats = async () => {
+  const now = new Date()
+  const options = {
+    order: [
+      [sequelize.fn('date_trunc', 'month', sequelize.col('date')), 'DESC'],
+    ],
+    attributes: [
+      [sequelize.fn('date_trunc', 'month', sequelize.col('date')), 'date'],
+      [
+        sequelize.cast(
+          sequelize.fn('sum', sequelize.col('transactions')),
+          'int'
+        ),
+        'transactions',
+      ],
+      [
+        sequelize.cast(sequelize.fn('sum', sequelize.col('soldItems')), 'int'),
+        'soldItems',
+      ],
+      [
+        sequelize.cast(
+          sequelize.fn('sum', sequelize.col('totalCogs')),
+          'float'
+        ),
+        'totalCogs',
+      ],
+      [
+        sequelize.cast(
+          sequelize.fn('sum', sequelize.col('grossProfit')),
+          'float'
+        ),
+        'grossProfit',
+      ],
+    ],
+    group: [sequelize.fn('date_trunc', 'month', sequelize.col('date'))],
+    where: {
+      [sequelize.Op.and]: [
+        sequelize.fn('EXTRACT(MONTH from "date") =', now.getMonth() + 1),
+        sequelize.fn('EXTRACT(YEAR from "date") =', now.getFullYear()),
+      ],
+    },
+  }
+
+  return DailyReport.findAll(options)
+}
