@@ -27,7 +27,29 @@ router.post('/logout', (req, res) => {
   return response.success(res, undefined, 'Log out success!')
 })
 
-router.post(
+router.get(
+  '/profile',
+  checkRole(['distributor', 'admin', 'dealer']),
+  async (req, res) => {
+    try {
+      const data = await userServices.getById(req.user.id)
+
+      if (!data) return response.unauthorized(res)
+
+      return response.success(res, data, 'Successfully retrieved user profile!')
+    } catch (error) {
+      console.log(error)
+
+      return response.internal_server_error(
+        res,
+        undefined,
+        'Failed to retrieve user profile!'
+      )
+    }
+  }
+)
+
+router.put(
   '/profile/edit',
   checkRole(['distributor', 'admin', 'dealer']),
   async (req, res) => {
