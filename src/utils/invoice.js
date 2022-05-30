@@ -69,9 +69,9 @@ module.exports = async (data = {}) => {
 
   const result = await easyinvoice.createInvoice(invoiceData)
 
-  const fileName = `invoices/${invoiceNumber}.pdf`
+  const fileName = `${invoiceNumber}.pdf`
 
-  fs.writeFileSync(fileName, result.pdf, 'base64')
+  fs.writeFileSync(`invoices/${fileName}`, result.pdf, 'base64')
 
   return fileName
 }

@@ -63,8 +63,6 @@ exports.updateProfile = async (id, data) => {
   if (updateData.role) delete updateData.role
   if (updateData.username) delete updateData.username
 
-  console.log(updateData)
-
   if (Object.keys(updateData).length < 1) return 204
 
   user.set(updateData)

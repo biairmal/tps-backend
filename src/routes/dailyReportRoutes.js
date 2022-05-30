@@ -6,22 +6,20 @@ const router = new Router()
 
 router.post(
   '/dailyReports/date',
-  checkRole(['distributor', 'admin']),
   dailyReportController.createDate
 )
 router.post(
   '/dailyReports/calculate',
-  checkRole(['distributor', 'admin']),
   dailyReportController.calculateDailyReport
 )
 router.get(
   '/dailyReports',
-  checkRole(['distributor', 'admin']),
+  checkRole(['distributor', 'admin', 'dealer']),
   dailyReportController.getDailyReports
 )
 router.get(
   '/dailyReports/summary',
-  checkRole(['distributor', 'admin']),
+  checkRole(['distributor', 'admin', 'dealer']),
   dailyReportController.getThisMonthStats
 )
 
