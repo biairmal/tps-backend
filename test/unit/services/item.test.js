@@ -139,7 +139,11 @@ describe('Stock Management', () => {
       res.body.should.have.property('message')
       res.body.message.should.equal('Successfully retrieved items!')
       res.body.should.have.property('data')
-      res.body.data.should.be.a('array')
+      res.body.data.should.be.a('object')
+      res.body.data.should.have.property('edge')
+      res.body.data.edge.should.be.a('array')
+      res.body.data.should.have.property('cursor')
+      res.body.data.cursor.should.be.a('object')
     })
 
     it('should return one item when id is specified', async () => {

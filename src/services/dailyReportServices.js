@@ -152,5 +152,17 @@ exports.getThisMonthStats = async () => {
     },
   }
 
-  return DailyReport.findAll(options)
+  const data = await DailyReport.findAll(options)
+
+  if (data.length < 1)
+    return [
+      {
+        transactions: 0,
+        soldItems: 0,
+        totalCogs: 0,
+        grossProfit: 0,
+      },
+    ]
+
+  return data
 }

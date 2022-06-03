@@ -5,7 +5,7 @@ const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const generateInvoice = require('../utils/invoice')
 
 exports.createTransaction = async (data, user) => {
-  const { buyer, items, notes } = data
+  const { buyer, items } = data
 
   const dbTransaction = await sequelize.transaction()
   const options = { transaction: dbTransaction }
@@ -103,7 +103,6 @@ exports.createTransaction = async (data, user) => {
       totalQuantity,
       subtotalPrice,
       totalPrice,
-      notes,
       cashierId: user.id,
       buyerId: buyerInfo.id,
       invoice: invoicePath,

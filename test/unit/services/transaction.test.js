@@ -58,13 +58,12 @@ describe('Transactions', () => {
           address: 'Test Street 12',
           city: 'Test City',
           country: 'Test Country',
+          customerType: 'dealer',
         },
         items: [
           { id: itemIds[0], quantity: 2 },
           { id: itemIds[1], quantity: 1 },
         ],
-        customerType: 'dealer',
-        notes: 'Notes',
       }
 
       const res = await chai
@@ -88,8 +87,6 @@ describe('Transactions', () => {
       res.body.data.subtotalPrice.should.equal(355000)
       res.body.data.should.have.property('totalPrice')
       res.body.data.totalPrice.should.equal(390500)
-      res.body.data.should.have.property('notes')
-      res.body.data.notes.should.equal('Notes')
       res.body.data.should.have.property('buyerId')
     })
 
@@ -97,13 +94,12 @@ describe('Transactions', () => {
       const data = {
         buyer: {
           id: buyerTestId,
+          customerType: 'dealer',
         },
         items: [
           { id: itemIds[0], quantity: 2 },
           { id: itemIds[1], quantity: 1 },
         ],
-        customerType: 'dealer',
-        notes: 'Notes',
       }
 
       const res = await chai
@@ -127,8 +123,6 @@ describe('Transactions', () => {
       res.body.data.subtotalPrice.should.equal(355000)
       res.body.data.should.have.property('totalPrice')
       res.body.data.totalPrice.should.equal(390500)
-      res.body.data.should.have.property('notes')
-      res.body.data.notes.should.equal('Notes')
       res.body.data.should.have.property('buyerId')
     })
 
@@ -222,7 +216,11 @@ describe('Transactions', () => {
       res.body.should.have.property('message')
       res.body.message.should.equal('Successfully retrieved transactions!')
       res.body.should.have.property('data')
-      res.body.data.should.be.a('array')
+      res.body.data.should.be.a('object')
+      res.body.data.should.have.property('edge')
+      res.body.data.edge.should.be.a('array')
+      res.body.data.should.have.property('cursor')
+      res.body.data.cursor.should.be.a('object')
     })
   })
 })

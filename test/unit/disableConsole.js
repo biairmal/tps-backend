@@ -1,11 +1,11 @@
 module.exports = () => {
-  // before((done) => {
-  //   console.log = function () {}
-  //   done()
-  // })
+  before((done) => {
+    console.log = function () {}
+    done()
+  })
 
-  // after((done) => {
-  //   delete console.log
-  //   done()
-  // })
+  after((done) => {
+    delete console.log
+    done()
+  })
 }
