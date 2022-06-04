@@ -1,13 +1,17 @@
-FROM node:16.15
+FROM node:18-alpine
 
-RUN mkdir -p /services/app/tps-api
-WORKDIR /services/app/tps-api
+# Setting up working directory
+RUN mkdir -p /app/api
+WORKDIR /app/api
 
-COPY package.json /services/app/tps-api
-COPY yarn.lock /services/app/tps-api
+# Installing dependencies
+COPY package.json .
+COPY yarn.lock .
 
-RUN yarn install
-RUN yarn add global sequelize-cli
+RUN yarn install --production
 
-COPY . /services/app/tps-api
+# Copying source code
+COPY . .
 
+# Create folder for invoices
+RUN mkdir -p /app/invoices
