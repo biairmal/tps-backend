@@ -8,7 +8,9 @@ WORKDIR /app/api
 COPY package.json .
 COPY yarn.lock .
 
+RUN apk update && apk add bash
 RUN yarn install --production
+RUN yarn add global sequelize-cli
 
 # Copying source code
 COPY . .

@@ -5,6 +5,10 @@ const express = require('express')
 const session = require('express-session')
 const SequelizeStore = require('connect-session-sequelize')(session.Store)
 const { CronJob } = require('cron')
+const fs = require('fs')
+const path = require('path')
+const http = require('http')
+const https = require('https')
 
 const passport = require('./utils/passport')
 const sessionConfig = require('./config/sessionsConfig')
@@ -13,7 +17,10 @@ const { connectDB, sequelize } = require('./utils/database')
 const routes = require('./routes')
 
 const app = express()
-const port = process.env.PORT || 8000
+const httpPort = process.env.HTTP_PORT || 8080
+const httpsPort = process.env.HTTPS_PORT || 8443
+const privateKey = fs.readFileSync(path.join(__dirname, '../cert/key.pem'))
+const certificate = fs.readFileSync(path.join(__dirname, '../cert/cert.pem'))
 const sessionStore = new SequelizeStore({
   db: sequelize,
 })
@@ -21,6 +28,10 @@ const corsOptions = {
   origin: process.env.CORS_ORIGIN,
   credentials: true, // access-control-allow-credentials:true
   optionSuccessStatus: 200,
+}
+const sslOptions = {
+  key: privateKey,
+  cert: certificate,
 }
 sessionStore.sync()
 
@@ -55,13 +66,17 @@ const calculateDailyReport = new CronJob(
   'Asia/Jakarta'
 )
 
+const httpServer = http.createServer(app)
+const httpsServer = https.createServer(sslOptions, app)
+
 createDailyReport.start()
 calculateDailyReport.start()
 // Connecting to DB and starting up the server
-connectDB().then(() => {
-  app.listen(port, () => {
-    console.log(`Server is running on port ${port}`)
-  })
+connectDB().then(async () => {
+  await httpServer.listen(httpPort)
+  await httpsServer.listen(httpsPort)
+  console.log(`Server is up and running on port ${httpPort} & ${httpsPort}`)
+
 })
 
 module.exports = app
