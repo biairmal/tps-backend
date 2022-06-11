@@ -13,7 +13,7 @@ function sessionConfig(sessionStore) {
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       sameSite: 'none',
-      secure: true, // ENABLE ONLY ON HTTPS
+      // secure: true, // ENABLE ONLY ON HTTPS
     },
   }
 }
