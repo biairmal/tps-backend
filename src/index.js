@@ -27,6 +27,7 @@ const sessionStore = new SequelizeStore({
 const corsOptions = {
   origin: process.env.CORS_ORIGIN,
   credentials: true, // access-control-allow-credentials:true
+  allowedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
   optionSuccessStatus: 200,
 }
 const sslOptions = {
@@ -76,7 +77,6 @@ connectDB().then(async () => {
   await httpServer.listen(httpPort)
   await httpsServer.listen(httpsPort)
   console.log(`Server is up and running on port ${httpPort} & ${httpsPort}`)
-
 })
 
 module.exports = app

@@ -16,4 +16,4 @@ RUN yarn add global sequelize-cli
 COPY . .
 
 # Create folder for invoices
-RUN mkdir -p /app/invoices
+RUN mkdir -p /app/api/invoices

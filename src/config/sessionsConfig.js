@@ -12,8 +12,8 @@ function sessionConfig(sessionStore) {
     saveUninitialized: true,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7,
-      sameSite: true,
-      secure: false, // ENABLE ONLY ON HTTPS
+      sameSite: 'none',
+      secure: true, // ENABLE ONLY ON HTTPS
     },
   }
 }
