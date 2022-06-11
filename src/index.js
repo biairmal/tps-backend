@@ -19,8 +19,8 @@ const routes = require('./routes')
 const app = express()
 const httpPort = process.env.HTTP_PORT || 8080
 const httpsPort = process.env.HTTPS_PORT || 8443
-const privateKey = fs.readFileSync(path.join(__dirname, '../cert/key.pem'))
-const certificate = fs.readFileSync(path.join(__dirname, '../cert/cert.pem'))
+const privateKey = fs.readFileSync(path.join(__dirname, '../cert/private.key'))
+const certificate = fs.readFileSync(path.join(__dirname, '../cert/certificate.crt'))
 const sessionStore = new SequelizeStore({
   db: sequelize,
 })
