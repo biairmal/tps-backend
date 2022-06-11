@@ -9,6 +9,11 @@ const sequelize = new Sequelize(DB.database, DB.username, DB.password, {
   port: DB.port,
   logging: false,
   ssl: true,
+  dialectOptions: {
+    ssl: {
+      require: true,
+    },
+  },
 })
 
 const connectDB = async () => {
