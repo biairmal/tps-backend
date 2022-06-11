@@ -12,6 +12,7 @@ const sequelize = new Sequelize(DB.database, DB.username, DB.password, {
   dialectOptions: {
     ssl: {
       require: true,
+      rejectUnauthorized: false,
     },
   },
 })
