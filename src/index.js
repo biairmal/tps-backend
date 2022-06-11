@@ -14,8 +14,7 @@ const { connectDB, sequelize } = require('./utils/database')
 const routes = require('./routes')
 
 const app = express()
-const httpPort = process.env.HTTP_PORT || 8080
-const httpsPort = process.env.HTTPS_PORT || 8443
+const httpPort = process.env.PORT || 8080
 const sessionStore = new SequelizeStore({
   db: sequelize,
 })
@@ -66,7 +65,7 @@ calculateDailyReport.start()
 // Connecting to DB and starting up the server
 connectDB().then(async () => {
   await httpServer.listen(httpPort)
-  console.log(`Server is up and running on port ${httpPort} & ${httpsPort}`)
+  console.log(`Server is up and running on port ${httpPort}`)
 })
 
 module.exports = app
