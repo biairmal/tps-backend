@@ -42,6 +42,11 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: 'Transaction',
+      defaultScope: {
+        order: [
+          ['createdAt', 'DESC'],
+        ],
+      },
     }
   )
   return Transaction

@@ -8,7 +8,8 @@ const createItemSchema = [
     .exists({ checkFalsy: true, checkNull: true })
     .withMessage('name can not be blank'),
   body('description')
-    .exists({ checkFalsy: true, checkNull: true })
+    .optional()
+    .exists({ checkFalsy: false, checkNull: true })
     .withMessage('description can not be blank'),
   body('picture')
     .optional()
@@ -46,7 +47,7 @@ const updateItemSchema = [
     .withMessage('name can not be blank'),
   body('description')
     .optional()
-    .exists({ checkFalsy: true, checkNull: true })
+    .exists({ checkFalsy: false, checkNull: true })
     .withMessage('description can not be blank'),
   body('picture')
     .optional()

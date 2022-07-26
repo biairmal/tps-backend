@@ -48,6 +48,10 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'User',
       defaultScope: {
         attributes: { exclude: ['password'] },
+        order: [
+          ['createdAt', 'DESC'],
+          ['username', 'ASC'],
+        ],
       },
       scopes: {
         withPassword: {

@@ -76,6 +76,12 @@ exports.updateItemById = async (req, res) => {
   } catch (error) {
     console.log(error)
 
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      const handledErrors = handleUniqueViolation(error)
+
+      return response.conflict(res, handledErrors, 'Failed to create item!')
+    }
+
     return response.internal_server_error(
       res,
       undefined,

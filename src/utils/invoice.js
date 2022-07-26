@@ -42,10 +42,10 @@ module.exports = async (data = {}) => {
     //   "background": "https://public.easyinvoice.cloud/img/watermark-draft.jpg"
     // },
     sender: {
-      company: 'Bandana Irmal Corp',
-      address: 'Somewhere Over The Rainbow',
-      zip: '1234 AB',
-      city: 'Cimahi',
+      company: 'Arunik Artventure',
+      address: 'Jl. Terusan. Prof. DR. Sutami Cav 6, Pasteur, Sarijadi, Kec. Sukasari',
+      zip: '40152',
+      city: 'Kota Bandung, Jawa Barat',
       country: 'Indonesia',
     },
     client,
@@ -55,7 +55,7 @@ module.exports = async (data = {}) => {
       'due-date': date,
     },
     products,
-    'bottom-notice': 'Terima kasih atas pembeliannya!',
+    'bottom-notice': 'Thank you for your purchase!',
     settings: {
       locale: 'id-ID',
       currency: 'IDR',

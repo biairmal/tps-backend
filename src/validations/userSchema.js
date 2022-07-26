@@ -20,7 +20,7 @@ const createUserSchema = [
     .withMessage('firstName can not be blank'),
   body('lastName')
     .optional()
-    .exists({ checkFalsy: true, checkNull: true })
+    .exists({ checkFalsy: false, checkNull: true })
     .withMessage('lastName can not be blank'),
   body('role')
     .exists({ checkFalsy: true, checkNull: true })
@@ -48,7 +48,7 @@ const updateUserSchema = [
     .withMessage('firstName can not be blank'),
   body('lastName')
     .optional()
-    .exists({ checkFalsy: true, checkNull: true })
+    .exists({ checkFalsy: false, checkNull: true })
     .withMessage('lastName can not be blank'),
   body('role')
     .optional()
