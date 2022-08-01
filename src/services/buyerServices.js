@@ -1,4 +1,5 @@
-const { parseSequelizeOptions } = require('../helpers')
+const { Op } = require('sequelize')
+const { parseSequelizeOptions, getCursorData } = require('../helpers')
 const { Buyer } = require('../models')
 
 exports.create = async (buyer, dbOptions = {}) => {
@@ -21,7 +22,26 @@ exports.create = async (buyer, dbOptions = {}) => {
 exports.get = async (query) => {
   const options = parseSequelizeOptions(query)
 
-  return Buyer.findAll(options)
+  if (query.search) {
+    delete options.where
+    const where = {
+      [Op.or]: [
+        { name: { [Op.iLike]: `%${query.search}%` } },
+        { phone: { [Op.iLike]: `%${query.search}%` } },
+      ],
+    }
+    options.where = where
+  }
+
+  const items = await Buyer.findAll(options)
+  const cursor = await getCursorData(Buyer, query)
+
+  const data = {
+    edge: items,
+    cursor,
+  }
+
+  return data
 }
 
 exports.getById = async (id) => {
