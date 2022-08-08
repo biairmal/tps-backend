@@ -119,7 +119,6 @@ describe('Buyer Management', () => {
       res.body.should.have.property('message')
       res.body.message.should.equal('Successfully retrieved buyers!')
       res.body.should.have.property('data')
-      res.body.data.should.be.a('array')
     })
 
     it('should return one buyer when id is specified', async () => {

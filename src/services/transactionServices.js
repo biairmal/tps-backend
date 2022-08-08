@@ -59,8 +59,8 @@ exports.createTransaction = async (data, user) => {
 
       totalProducts += 1
       totalQuantity += buyQuantity[item.id]
-      subtotalPrice += price
-      totalPrice += (price * (100 + item.tax)) / 100
+      subtotalPrice += price * buyQuantity[item.id]
+      totalPrice += ((price * (100 + item.tax)) / 100) * buyQuantity[item.id]
 
       await SoldItem.create(
         {
@@ -103,7 +103,7 @@ exports.createTransaction = async (data, user) => {
       totalQuantity,
       subtotalPrice,
       totalPrice,
-      cashierId: user.id,
+      cashierId: user.id, // disable on unit test
       buyerId: buyerInfo.id,
       invoice: invoicePath,
     })

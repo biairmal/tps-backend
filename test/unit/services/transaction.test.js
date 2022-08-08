@@ -84,9 +84,9 @@ describe('Transactions', () => {
       res.body.data.should.have.property('totalQuantity')
       res.body.data.totalQuantity.should.equal(3)
       res.body.data.should.have.property('subtotalPrice')
-      res.body.data.subtotalPrice.should.equal(355000)
+      res.body.data.subtotalPrice.should.equal(475000)
       res.body.data.should.have.property('totalPrice')
-      res.body.data.totalPrice.should.equal(390500)
+      res.body.data.totalPrice.should.equal(522500)
       res.body.data.should.have.property('buyerId')
     })
 
@@ -120,9 +120,9 @@ describe('Transactions', () => {
       res.body.data.should.have.property('totalQuantity')
       res.body.data.totalQuantity.should.equal(3)
       res.body.data.should.have.property('subtotalPrice')
-      res.body.data.subtotalPrice.should.equal(355000)
+      res.body.data.subtotalPrice.should.equal(475000)
       res.body.data.should.have.property('totalPrice')
-      res.body.data.totalPrice.should.equal(390500)
+      res.body.data.totalPrice.should.equal(522500)
       res.body.data.should.have.property('buyerId')
     })
 
